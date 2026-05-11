@@ -1,0 +1,8 @@
+html,body {min-height: 100vh; background-color: #f8fae3;}
+html{height:100%;}
+body {font-family: 'Inter', sans-serif;}
+.hero-section {padding: 60px 0; background-color: #f8fae3;}
+.login-section {min-height: calc(100vh - 136px); padding-top: 90px; padding-bottom: 80px;}
+.card { border: none; transition: transform 0.3s; background-color: white; }
+.card:hover { transform: translateY(-5px); }
+.navbar-brand { font-weight: bold; }
