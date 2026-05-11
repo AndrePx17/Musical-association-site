@@ -1,0 +1,53 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores e ferramentas locais
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Ficheiros locais do Codex/agents
+.agents/
+.codex/
+
+# Variaveis de ambiente e configuracoes locais
+.env
+.env.*
+!.env.example
+Backend/config.local.php
+Backend/config.php
+
+# Dependencias PHP, caso o projeto venha a usar Composer
+vendor/
+composer.phar
+
+# Dependencias frontend, caso venham a ser usadas
+node_modules/
+
+# Logs, caches e ficheiros temporarios
+*.log
+logs/
+tmp/
+temp/
+cache/
+.cache/
+
+# Docker e dados locais
+docker-compose.override.yml
+mysql-data/
+db_data/
+
+# Exports/backups locais da base de dados
+Database/backups/
+Database/dumps/
+*.dump
+*.backup
+*.bak
+
+# Artefactos de build/cobertura
+dist/
+build/
+coverage/
