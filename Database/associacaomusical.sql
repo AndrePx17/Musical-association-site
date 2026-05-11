@@ -24,3 +24,10 @@ CREATE TABLE IF NOT EXISTS TB_noticias(
     user_id INT,
     foreign key (user_id) references TB_users(id_user)
 );
+
+CREATE TABLE IF NOT EXISTS TB_horarios (
+    id_horario INT AUTO_INCREMENT PRIMARY KEY,
+    instrumento VARCHAR(100) NOT NULL UNIQUE,
+    imagem VARCHAR(255) NOT NULL,
+    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

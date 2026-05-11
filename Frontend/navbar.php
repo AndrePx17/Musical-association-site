@@ -10,9 +10,10 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="../www/index.php">Início</a></li>
-                <li class="nav-item"><a class="nav-link" href="../Backend/noticias.php">Notícias</a></li>
-                <li class="nav-item"><a class="nav-link" href="../Backend/login.php">Login Admin</a></li>
+                <li class="nav-item"><a class="nav-link" href="/www/index.php">Início</a></li>
+                <li class="nav-item"><a class="nav-link" href="/Backend/noticias.php">Notícias</a></li>
+                <li class="nav-item"><a class="nav-link" href="/Backend/horarios.php">Horários</a></li>
+                <li class="nav-item"><a class="nav-link" href="/Backend/login.php">Login Admin</a></li>
                 <?php if(isset($_SESSION["id_user"])) { ?>
                     <li class="nav-item"><a class="nav-link text-danger" href="../Backend/logout.php">Sair</a></li>
                 <?php }?>
