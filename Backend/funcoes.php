@@ -12,7 +12,7 @@ if(isset($_POST["entrar"])){
         $_SESSION["id_user"]=$user["id_user"];
         $_SESSION["username"]=$user["username"];
         $_SESSION["tipo_id"]=$user["tipo_id"];
-        header("Location: ../www/index.php");
+        header("Location: ../index.php");
         exit();
     } 
     else{

@@ -13,29 +13,48 @@ if(isset($_POST["criar_noticia"]) && isset($_SESSION["id_user"])){
     $titulo=trim($_POST["titulo"] ?? "");
     $resumo=trim($_POST["resumo"] ?? "");
     $corpo=trim($_POST["corpo"] ?? "");
-    $imagem=trim($_POST["imagem"] ?? "");
     $user_id=(int) $_SESSION["id_user"];
 
     if($titulo=="" || $resumo=="" || $corpo==""){
         $erroNoticia="Preencha o titulo, o resumo e a mensagem da noticia.";
     }
+    elseif(!isset($_FILES["imagem"]) || $_FILES["imagem"]["error"]!=UPLOAD_ERR_OK){
+        $erroNoticia="Escolha uma imagem para a noticia.";
+    }
     else{
-        $stmt=$conn->prepare("INSERT INTO TB_noticias (titulo, resumo, corpo, imagem, user_id) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssi", $titulo, $resumo, $corpo, $imagem, $user_id);
+        $target_path="../images/noticias/";
+        $nomeImagem=basename($_FILES["imagem"]["name"]);
+        $target_file=$target_path.$nomeImagem;
+        $imageFileType=strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        $imagem="images/noticias/".$nomeImagem;
 
-        try{
-            $criada=$stmt->execute();
-        }
-        catch(mysqli_sql_exception $e){
-            $criada=false;
-        }
-
-        if($criada){
-            header("Location: noticias.php?sucesso=1");
-            exit();
+        if($imageFileType!="jpg" && $imageFileType!="png" && $imageFileType!="jpeg" && $imageFileType!="gif"){
+            $erroNoticia="Formato inválido. Use JPG, PNG, JPEG ou GIF.";
         }
         else{
-            $erroNoticia="Erro ao criar a noticia. Tente novamente.";
+            if(move_uploaded_file($_FILES["imagem"]["tmp_name"], $target_file)){
+                $stmt=$conn->prepare("INSERT INTO TB_noticias (titulo, resumo, corpo, imagem, user_id) VALUES (?, ?, ?, ?, ?)");
+                $stmt->bind_param("ssssi", $titulo, $resumo, $corpo, $imagem, $user_id);
+
+                try{
+                    $criada=$stmt->execute();
+                }
+                catch(mysqli_sql_exception $e){
+                    $criada=false;
+                }
+
+                if($criada){
+                    header("Location: noticias.php?sucesso=1");
+                    exit();
+                }
+                else{
+                    $erroNoticia="Erro ao criar a noticia. Tente novamente.";
+                }
+                $stmt->close();
+            }
+            else{
+                $erroNoticia="Erro ao guardar o ficheiro no servidor.";
+            }
         }
     }
 }
@@ -87,7 +106,7 @@ $noticias=$conn->query("SELECT id_noticia, titulo, corpo, imagem, data_criacao F
                                         <div class="alert alert-success"><?= htmlspecialchars($sucessoNoticia) ?></div>
                                     <?php } ?>
 
-                                    <form method="post">
+                                    <form method="post" enctype="multipart/form-data">
                                         <div class="mb-3">
                                             <label class="form-label">Título</label>
                                             <input type="text" name="titulo" class="form-control"
@@ -106,9 +125,8 @@ $noticias=$conn->query("SELECT id_noticia, titulo, corpo, imagem, data_criacao F
                                         </div>
                                         <div class="mb-4">
                                             <label class="form-label">Imagem</label>
-                                            <input type="text" name="imagem" class="form-control"
-                                                   placeholder="Ex: Frontend/imagens/noticia.jpg"
-                                                   value="<?= isset($_POST["imagem"]) ? htmlspecialchars($_POST["imagem"]) : "" ?>">
+                                            <input type="file" name="imagem" class="form-control" accept="image/jpeg,image/png,image/gif" required>
+                                            <div class="form-text">Formatos: JPG, PNG, JPEG ou GIF.</div>
                                         </div>
                                         <button type="submit" name="criar_noticia" class="btn btn-dark w-100">Publicar notícia</button>
                                     </form>

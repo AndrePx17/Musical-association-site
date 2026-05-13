@@ -25,9 +25,14 @@ CREATE TABLE IF NOT EXISTS TB_noticias(
     foreign key (user_id) references TB_users(id_user)
 );
 
+CREATE TABLE IF NOT EXISTS TB_instrumentos(
+    id_instrumento INT UNIQUE PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    codigo VARCHAR(100) NOT NULL UNIQUE
+);
+
 CREATE TABLE IF NOT EXISTS TB_horarios (
-    id_horario INT AUTO_INCREMENT PRIMARY KEY,
-    instrumento VARCHAR(100) NOT NULL UNIQUE,
+    instrumento VARCHAR(100) NOT NULL PRIMARY KEY,
     imagem VARCHAR(255) NOT NULL,
     data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

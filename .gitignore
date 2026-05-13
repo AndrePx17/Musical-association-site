@@ -35,6 +35,9 @@ temp/
 cache/
 .cache/
 
+# Imagens carregadas pelo site
+images/
+
 # Docker e dados locais
 docker-compose.override.yml
 mysql-data/

@@ -27,7 +27,7 @@ $ultimasNoticias=$conn->query("SELECT id_noticia, titulo, resumo, corpo, imagem,
         <div class="carousel-inner">
             <div class="carousel-item active">
                 <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 400px;">
-                    <h1>Bem-vindo à Associação Musical</h1>
+                    <h1>Bem-vindo ao site da Associação Musical de Pedroso</h1>
                 </div>
             </div>
             </div>
