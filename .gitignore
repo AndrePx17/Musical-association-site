@@ -54,3 +54,5 @@ Database/dumps/
 dist/
 build/
 coverage/
+
+GEMINI.md

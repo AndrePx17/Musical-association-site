@@ -6,3 +6,18 @@ body {font-family: 'Inter', sans-serif;}
 .card { border: none; transition: transform 0.3s; background-color: white; }
 .card:hover { transform: translateY(-5px); }
 .navbar-brand { font-weight: bold; }
+.noticia-card-img { height: 220px; object-fit: cover; object-position: center; }
+.noticia-modal-dialog { width: calc(100vw - 32px); max-width: 1200px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
+.noticia-modal-content { max-width: 100%; max-height: calc(100vh - 48px); overflow: hidden; }
+.noticia-modal-body { max-width: 100%; overflow-x: hidden; overflow-y: auto; }
+.noticia-modal-media { display: flex; align-items: center; justify-content: center; margin-bottom: 16px; border-radius: 8px; background-color: #f8fae3; overflow: hidden; }
+.noticia-modal-img { display: block; width: 100%; max-width: 100%; max-height: 45vh; object-fit: contain; }
+.noticia-modal-copy { min-width: 0; max-width: 100%; }
+.noticia-modal-text { white-space: pre-line; overflow-wrap: anywhere; word-break: break-word; }
+
+@media (max-width: 768px) {
+    .noticia-card-img { height: 180px; }
+    .noticia-modal-dialog { width: calc(100vw - 16px); margin: 8px auto; }
+    .noticia-modal-content { max-height: calc(100vh - 16px); }
+    .noticia-modal-img { max-height: 38vh; }
+}

@@ -15,6 +15,7 @@
                 <li class="nav-item"><a class="nav-link" href="/Backend/horarios.php">Horários</a></li>
                 <li class="nav-item"><a class="nav-link" href="/Backend/login.php">Login Admin</a></li>
                 <?php if(isset($_SESSION["id_user"])) { ?>
+                    <li class="nav-item"><a class="nav-link" href="/Backend/admin.php">Painel Controlo</a></li>
                     <li class="nav-item"><a class="nav-link text-danger" href="../Backend/logout.php">Sair</a></li>
                 <?php }?>
             </ul>

@@ -36,3 +36,34 @@ CREATE TABLE IF NOT EXISTS TB_horarios (
     imagem VARCHAR(255) NOT NULL,
     data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+-- Tabela de Logs para Auditoria (Triggers)
+CREATE TABLE IF NOT EXISTS TB_logs (
+    id_log INT PRIMARY KEY AUTO_INCREMENT,
+    mensagem VARCHAR(255),
+    data_evento TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- View para simplificar a consulta de notícias com o nome do autor
+CREATE OR REPLACE VIEW VW_noticias_com_autor AS
+SELECT 
+    n.id_noticia, 
+    n.titulo, 
+    n.resumo, 
+    n.corpo, 
+    n.imagem, 
+    n.data_criacao, 
+    u.username AS autor
+FROM TB_noticias n
+JOIN TB_users u ON n.user_id = u.id_user;
+
+-- Trigger para registar quando uma notícia é removida
+DELIMITER //
+CREATE TRIGGER IF NOT EXISTS TR_noticia_removida
+AFTER DELETE ON TB_noticias
+FOR EACH ROW
+BEGIN
+    INSERT INTO TB_logs (mensagem)
+    VALUES (CONCAT('Notícia removida: ', OLD.titulo, ' (ID: ', OLD.id_noticia, ')'));
+END //
+DELIMITER ;

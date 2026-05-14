@@ -9,6 +9,87 @@ if(isset($_GET["sucesso"]) && $_GET["sucesso"]=="1"){
     $sucessoNoticia="Noticia criada com sucesso.";
 }
 
+if(isset($_GET["removida"]) && $_GET["removida"]=="1"){
+    $sucessoNoticia="Noticia removida com sucesso.";
+}
+
+if(isset($_GET["editada"]) && $_GET["editada"]=="1"){
+    $sucessoNoticia="Noticia editada com sucesso.";
+}
+
+if(isset($_POST["remover_noticia"]) && isset($_SESSION["id_user"])){
+    $noticiaId=(int) ($_POST["id_noticia"] ?? 0);
+
+    if($noticiaId<=0){
+        $erroNoticia="Escolha uma noticia válida para remover.";
+    }
+    else{
+        $stmt=$conn->prepare("DELETE FROM TB_noticias WHERE id_noticia=?");
+        $stmt->bind_param("i", $noticiaId);
+
+        if($stmt->execute()){
+            header("Location: noticias.php?removida=1");
+            exit();
+        }
+        else{
+            $erroNoticia="Erro ao remover a noticia.";
+        }
+        $stmt->close();
+    }
+}
+
+if(isset($_POST["editar_noticia"]) && isset($_SESSION["id_user"])){
+    $noticiaId=(int) ($_POST["id_noticia"] ?? 0);
+    $titulo=trim($_POST["titulo"] ?? "");
+    $resumo=trim($_POST["resumo"] ?? "");
+    $corpo=trim($_POST["corpo"] ?? "");
+    $novaImagem="";
+    $erroUpload=$_FILES["imagem"]["error"] ?? UPLOAD_ERR_NO_FILE;
+
+    if($noticiaId<=0 || $titulo=="" || $resumo=="" || $corpo==""){
+        $erroNoticia="Preencha todos os campos da noticia.";
+    }
+    elseif($erroUpload!=UPLOAD_ERR_OK && $erroUpload!=UPLOAD_ERR_NO_FILE){
+        $erroNoticia="Erro ao carregar a imagem.";
+    }
+    else{
+        if($erroUpload==UPLOAD_ERR_OK){
+            $target_path="../images/noticias/";
+            $nomeImagem=basename($_FILES["imagem"]["name"]);
+            $target_file=$target_path.$nomeImagem;
+            $imageFileType=strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+            $novaImagem="images/noticias/".$nomeImagem;
+
+            if($imageFileType!="jpg" && $imageFileType!="png" && $imageFileType!="jpeg" && $imageFileType!="gif"){
+                $erroNoticia="Formato inválido. Use JPG, PNG, JPEG ou GIF.";
+            }
+            elseif(!move_uploaded_file($_FILES["imagem"]["tmp_name"], $target_file)){
+                $erroNoticia="Erro ao guardar o ficheiro no servidor.";
+            }
+        }
+
+        if($erroNoticia==""){
+            if($novaImagem!=""){
+                $stmt=$conn->prepare("UPDATE TB_noticias SET titulo=?, resumo=?, corpo=?, imagem=? WHERE id_noticia=?");
+                $stmt->bind_param("ssssi", $titulo, $resumo, $corpo, $novaImagem, $noticiaId);
+            }
+            else{
+                $stmt=$conn->prepare("UPDATE TB_noticias SET titulo=?, resumo=?, corpo=? WHERE id_noticia=?");
+                $stmt->bind_param("sssi", $titulo, $resumo, $corpo, $noticiaId);
+            }
+
+            if($stmt->execute()){
+                header("Location: noticias.php?editada=1");
+                exit();
+            }
+            else{
+                $erroNoticia="Erro ao editar a noticia.";
+            }
+            $stmt->close();
+        }
+    }
+}
+
 if(isset($_POST["criar_noticia"]) && isset($_SESSION["id_user"])){
     $titulo=trim($_POST["titulo"] ?? "");
     $resumo=trim($_POST["resumo"] ?? "");
@@ -59,7 +140,7 @@ if(isset($_POST["criar_noticia"]) && isset($_SESSION["id_user"])){
     }
 }
 
-$noticias=$conn->query("SELECT id_noticia, titulo, corpo, imagem, data_criacao FROM TB_noticias ORDER BY data_criacao DESC, id_noticia DESC");
+$noticias=$conn->query("SELECT id_noticia, titulo, resumo, corpo, imagem, data_criacao FROM TB_noticias ORDER BY data_criacao DESC, id_noticia DESC");
 ?>
 <!DOCTYPE html>
 <html>
@@ -67,9 +148,9 @@ $noticias=$conn->query("SELECT id_noticia, titulo, corpo, imagem, data_criacao F
         <meta charset="utf-8">
         <title>Associação Musical de Pedroso</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="../Frontend/style.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="../Frontend/style.css">
         <style>
             .card {
                 transform: none !important;
@@ -144,17 +225,49 @@ $noticias=$conn->query("SELECT id_noticia, titulo, corpo, imagem, data_criacao F
                 <div class="row g-4">
                     <?php if($noticias && $noticias->num_rows > 0){ ?>
                         <?php while($noticia=$noticias->fetch_assoc()){ ?>
+                            <?php $imagemModal=$noticia["imagem"] != "" ? "../".$noticia["imagem"] : ""; ?>
                             <div class="col-12 col-md-6 col-lg-4">
                                 <div class="card h-100 shadow-sm">
                                     <?php if($noticia["imagem"] != ""){ ?>
-                                        <img src="../<?= htmlspecialchars($noticia["imagem"]) ?>" class="card-img-top" alt="<?= htmlspecialchars($noticia["titulo"]) ?>">
+                                        <img src="../<?= htmlspecialchars($noticia["imagem"]) ?>" class="card-img-top noticia-card-img" alt="<?= htmlspecialchars($noticia["titulo"]) ?>">
                                     <?php } ?>
-                                    <div class="card-body">
+                                    <div class="card-body d-flex flex-column">
                                         <p class="text-muted small mb-2">
                                             <?= date("d/m/Y", strtotime($noticia["data_criacao"])) ?>
                                         </p>
                                         <h5 class="card-title"><?= htmlspecialchars($noticia["titulo"]) ?></h5>
-                                        <p class="card-text text-muted"><?= nl2br(htmlspecialchars($noticia["corpo"])) ?></p>
+                                        <p class="card-text text-muted flex-grow-1"><?= htmlspecialchars($noticia["resumo"] ?? "") ?></p>
+                                        <div class="d-flex gap-2 flex-wrap">
+                                            <button type="button"
+                                                    class="btn btn-outline-primary btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#noticiaModal"
+                                                    data-noticia-titulo="<?= htmlspecialchars($noticia["titulo"], ENT_QUOTES, "UTF-8") ?>"
+                                                    data-noticia-data="<?= date("d/m/Y", strtotime($noticia["data_criacao"])) ?>"
+                                                    data-noticia-imagem="<?= htmlspecialchars($imagemModal, ENT_QUOTES, "UTF-8") ?>"
+                                                    data-noticia-corpo="<?= htmlspecialchars($noticia["corpo"], ENT_QUOTES, "UTF-8") ?>">
+                                                Ler mais
+                                            </button>
+
+                                            <?php if(isset($_SESSION["id_user"])){ ?>
+                                                <button type="button"
+                                                        class="btn btn-outline-secondary btn-sm"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editarNoticiaModal"
+                                                        data-noticia-id="<?= (int) $noticia["id_noticia"] ?>"
+                                                        data-noticia-titulo="<?= htmlspecialchars($noticia["titulo"], ENT_QUOTES, "UTF-8") ?>"
+                                                        data-noticia-resumo="<?= htmlspecialchars($noticia["resumo"] ?? "", ENT_QUOTES, "UTF-8") ?>"
+                                                        data-noticia-corpo="<?= htmlspecialchars($noticia["corpo"], ENT_QUOTES, "UTF-8") ?>"
+                                                        data-noticia-imagem="<?= htmlspecialchars($imagemModal, ENT_QUOTES, "UTF-8") ?>">
+                                                    Editar
+                                                </button>
+
+                                                <form method="post" class="m-0" onsubmit="return confirm('Tem a certeza que quer remover esta notícia?')">
+                                                    <input type="hidden" name="id_noticia" value="<?= (int) $noticia["id_noticia"] ?>">
+                                                    <button type="submit" name="remover_noticia" class="btn btn-outline-danger btn-sm">Remover</button>
+                                                </form>
+                                            <?php } ?>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -168,7 +281,130 @@ $noticias=$conn->query("SELECT id_noticia, titulo, corpo, imagem, data_criacao F
             </div>
         </section>
 
+        <div class="modal fade" id="noticiaModal" tabindex="-1" aria-labelledby="noticiaModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl noticia-modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content noticia-modal-content">
+                    <div class="modal-header">
+                        <div>
+                            <h5 class="modal-title" id="noticiaModalLabel"></h5>
+                            <p class="text-muted small mb-0" id="noticiaModalData"></p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body noticia-modal-body">
+                        <div class="noticia-modal-media" id="noticiaModalMedia">
+                            <img src="" alt="" class="noticia-modal-img d-none" id="noticiaModalImagem">
+                        </div>
+                        <div class="noticia-modal-copy">
+                            <p class="noticia-modal-text mb-0" id="noticiaModalCorpo"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <?php if(isset($_SESSION["id_user"])){ ?>
+            <div class="modal fade" id="editarNoticiaModal" tabindex="-1" aria-labelledby="editarNoticiaModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <form method="post" enctype="multipart/form-data">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editarNoticiaModalLabel">Editar notícia</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" name="id_noticia" id="editarNoticiaId">
+
+                                <div class="mb-3">
+                                    <label class="form-label">Título</label>
+                                    <input type="text" name="titulo" id="editarNoticiaTitulo" class="form-control" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Resumo</label>
+                                    <input type="text" name="resumo" id="editarNoticiaResumo" class="form-control" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Mensagem</label>
+                                    <textarea name="corpo" id="editarNoticiaCorpo" class="form-control" rows="6" required></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Nova imagem</label>
+                                    <input type="file" name="imagem" id="editarNoticiaImagem" class="form-control" accept="image/jpeg,image/png,image/gif">
+                                    <div class="form-text" id="editarNoticiaImagemAtual">Deixe em branco para manter a imagem atual.</div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" name="editar_noticia" class="btn btn-dark">Guardar alterações</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
+
         <?php include "../Frontend/footer.php";?>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            var noticiaModal=document.getElementById("noticiaModal");
+
+            if(noticiaModal){
+                noticiaModal.addEventListener("show.bs.modal", function(event){
+                    var botao=event.relatedTarget;
+
+                    if(!botao){
+                        return;
+                    }
+
+                    var titulo=botao.getAttribute("data-noticia-titulo") || "";
+                    var data=botao.getAttribute("data-noticia-data") || "";
+                    var imagem=botao.getAttribute("data-noticia-imagem") || "";
+                    var corpo=botao.getAttribute("data-noticia-corpo") || "";
+                    var imagemModal=document.getElementById("noticiaModalImagem");
+                    var mediaModal=document.getElementById("noticiaModalMedia");
+
+                    document.getElementById("noticiaModalLabel").textContent=titulo;
+                    document.getElementById("noticiaModalData").textContent=data;
+                    document.getElementById("noticiaModalCorpo").textContent=corpo;
+
+                    if(imagem!=""){
+                        imagemModal.src=imagem;
+                        imagemModal.alt=titulo;
+                        imagemModal.classList.remove("d-none");
+                        mediaModal.classList.remove("d-none");
+                    }
+                    else{
+                        imagemModal.removeAttribute("src");
+                        imagemModal.alt="";
+                        imagemModal.classList.add("d-none");
+                        mediaModal.classList.add("d-none");
+                    }
+                });
+            }
+
+            var editarNoticiaModal=document.getElementById("editarNoticiaModal");
+
+            if(editarNoticiaModal){
+                editarNoticiaModal.addEventListener("show.bs.modal", function(event){
+                    var botao=event.relatedTarget;
+
+                    if(!botao){
+                        return;
+                    }
+
+                    var imagem=botao.getAttribute("data-noticia-imagem") || "";
+
+                    document.getElementById("editarNoticiaId").value=botao.getAttribute("data-noticia-id") || "";
+                    document.getElementById("editarNoticiaTitulo").value=botao.getAttribute("data-noticia-titulo") || "";
+                    document.getElementById("editarNoticiaResumo").value=botao.getAttribute("data-noticia-resumo") || "";
+                    document.getElementById("editarNoticiaCorpo").value=botao.getAttribute("data-noticia-corpo") || "";
+                    document.getElementById("editarNoticiaImagem").value="";
+                    document.getElementById("editarNoticiaImagemAtual").textContent=imagem!="" ? "Deixe em branco para manter a imagem atual." : "Esta notícia não tem imagem atual.";
+                });
+            }
+        </script>
     </body>
 </html>
