@@ -11,16 +11,8 @@ if (!isset($_SESSION["id_user"])) {
 $erro = "";
 $sucesso = "";
 
-// Consulta para buscar os logs (Triggers em ação)
+// Consulta para buscar os logs
 $logs = $conn->query("SELECT id_log, mensagem, data_evento FROM TB_logs ORDER BY data_evento DESC LIMIT 50");
-
-// Consulta complexa para estatísticas (Efeito "Uau" para o professor)
-$stats_noticias = $conn->query("
-    SELECT u.username, COUNT(n.id_noticia) as total 
-    FROM TB_users u 
-    LEFT JOIN TB_noticias n ON u.id_user = n.user_id 
-    GROUP BY u.username
-");
 ?>
 <!DOCTYPE html>
 <html lang="pt">
@@ -33,68 +25,52 @@ $stats_noticias = $conn->query("
     <link href="../Frontend/style.css" rel="stylesheet">
 </head>
 <body>
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container">
-            <?php include "../Frontend/navbar.php"; ?>
-        </div>
-    </nav>
+    <div id="flex-wrapper">
+    <?php include "../Frontend/navbar.php"; ?>
 
     <div class="container py-5">
-        <div class="row mb-4">
-            <div class="col-12">
-                <h1 class="h2">Painel de Controlo (Backoffice)</h1>
-                <p class="text-muted">Bem-vindo, <strong><?= htmlspecialchars($_SESSION["username"]) ?></strong>. Aqui podes gerir o conteúdo do site.</p>
+        <div class="row mb-5">
+            <div class="col-12 text-center text-lg-start">
+                <span class="badge bg-light text-primary px-3 py-2 mb-3 shadow-sm">Área Administrativa</span>
+                <h1 class="display-5 mb-2 fw-bold">Painel de Controlo</h1>
+                <p class="muted lead">Bem-vindo, <span class="text-primary fw-bold"><?= htmlspecialchars($_SESSION["username"]) ?></span>. Gestão de conteúdos e registos do sistema.</p>
             </div>
         </div>
 
-        <div class="row g-4">
-            <!-- Estatísticas Rápidas -->
-            <div class="col-12 col-lg-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-white fw-bold">Resumo de Atividade</div>
-                    <div class="card-body">
-                        <ul class="list-group list-group-flush">
-                            <?php while($row = $stats_noticias->fetch_assoc()){ ?>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <?= htmlspecialchars($row["username"]) ?>
-                                    <span class="badge bg-primary rounded-pill"><?= $row["total"] ?> notícias</span>
-                                </li>
-                            <?php } ?>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Logs do Sistema (Triggers) -->
-            <div class="col-12 col-lg-8">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                        <span class="fw-bold">Histórico de Eventos (Logs)</span>
-                        <span class="badge bg-info text-dark">Trigger: TR_noticia_removida</span>
+        <div class="row">
+            <!-- Logs do Sistema -->
+            <div class="col-12">
+                <div class="card border-0 shadow-sm overflow-hidden">
+                    <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold" style="color:black !important">Histórico de Eventos <small class="muted fw-normal ms-2">(Logs)</small></h5>
+                        <span class="badge bg-light muted fw-normal">Últimos 50 eventos</span>
                     </div>
                     <div class="card-body p-0">
-                        <div class="table-responsive" style="max-height: 400px;">
-                            <table class="table table-hover mb-0">
+                        <div class="table-responsive" style="max-height: 500px;">
+                            <table class="table table-hover align-middle mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>ID</th>
+                                        <th class="ps-4">ID</th>
                                         <th>Mensagem</th>
-                                        <th>Data</th>
+                                        <th class="pe-4">Data e Hora</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php if($logs && $logs->num_rows > 0){ ?>
                                         <?php while($log = $logs->fetch_assoc()){ ?>
                                             <tr>
-                                                <td>#<?= $log["id_log"] ?></td>
-                                                <td><?= htmlspecialchars($log["mensagem"]) ?></td>
-                                                <td class="small text-muted"><?= date("d/m/Y H:i", strtotime($log["data_evento"])) ?></td>
+                                                <td class="ps-4 muted small">#<?= $log["id_log"] ?></td>
+                                                <td>
+                                                    <div class="fw-medium text-dark small"><?= htmlspecialchars($log["mensagem"]) ?></div>
+                                                </td>
+                                                <td class="pe-4 small muted"><?= date("d/m/Y H:i", strtotime($log["data_evento"])) ?></td>
                                             </tr>
                                         <?php } ?>
                                     <?php } else { ?>
                                         <tr>
-                                            <td colspan="3" class="text-center py-4 text-muted">Nenhum evento registado ainda.</td>
+                                            <td colspan="3" class="text-center py-5">
+                                                <div class="muted">Nenhum evento registado ainda.</div>
+                                            </td>
                                         </tr>
                                     <?php } ?>
                                 </tbody>
@@ -104,18 +80,7 @@ $stats_noticias = $conn->query("
                 </div>
             </div>
         </div>
-
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card shadow-sm">
-                    <div class="card-body d-flex gap-3">
-                        <a href="noticias.php" class="btn btn-dark">Gerir Notícias</a>
-                        <a href="horarios.php" class="btn btn-dark">Gerir Horários</a>
-                        <a href="../index.php" class="btn btn-outline-secondary">Ver Site Público</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+    </div>
     </div>
 
     <?php include "../Frontend/footer.php"; ?>

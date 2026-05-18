@@ -1,5 +1,7 @@
-CREATE DATABASE IF NOT EXISTS BD_associacao;
+CREATE DATABASE IF NOT EXISTS BD_associacao DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE BD_associacao;
+
+SET NAMES utf8mb4;
 
 CREATE TABLE IF NOT EXISTS TB_tipo(
     id_tipo INT UNIQUE PRIMARY KEY AUTO_INCREMENT,
@@ -67,3 +69,7 @@ BEGIN
     VALUES (CONCAT('Notícia removida: ', OLD.titulo, ' (ID: ', OLD.id_noticia, ')'));
 END //
 DELIMITER ;
+
+INSERT INTO TB_tipo(tipo)
+VALUES
+("admin")

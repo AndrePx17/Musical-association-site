@@ -1,6 +1,8 @@
 services:
   php-server:
     build: .
+    environment:
+      - TZ=Europe/Lisbon
     ports:
       - "8080:80"
     volumes:
@@ -14,6 +16,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: BD_associacao
+      TZ: Europe/Lisbon
     ports:
       - "3307:3306"
     volumes:
@@ -29,6 +32,7 @@ services:
       PMA_HOST: db
       PMA_USER: root
       PMA_PASSWORD: root
+      TZ: Europe/Lisbon
     depends_on:
       - db
     restart: always

@@ -14,48 +14,130 @@ $ultimasNoticias=$conn->query("SELECT id_noticia, titulo, resumo, corpo, imagem,
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link href="Frontend/style.css" rel="stylesheet">
+    <style>
+        #heroCaurossel,
+        #heroCaurossel .carousel-inner,
+        #heroCaurossel .carousel-item {
+            min-height: 520px;
+        }
+        #heroCaurossel .carousel-item img {
+            width: 100%;
+            height: 520px;
+            object-fit: cover;
+            object-position: center;
+        }
+        #heroCaurossel .carousel-item {
+            background-color: var(--bs-dark, #0d1b2a);
+        }
+        #heroCaurossel .carousel-caption {
+            bottom: 20%;
+            padding: 0 5%;
+        }
+        #heroCaurossel .carousel-caption h2 {
+            font-size: clamp(1.4rem, 3vw, 2.4rem);
+            font-weight: 700;
+            text-shadow: 0 2px 8px rgba(0,0,0,.6);
+        }
+        #heroCaurossel .carousel-caption p {
+            font-size: 1.05rem;
+            text-shadow: 0 1px 4px rgba(0,0,0,.5);
+            margin-bottom: 1.5rem;
+        }
+        /* Overlay escuro sobre as imagens para legibilidade do texto */
+        #heroCaurossel .carousel-item::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,.25) 0%, rgba(0,0,0,.55) 100%);
+            pointer-events: none;
+        }
+        #heroCaurossel .carousel-caption {
+            z-index: 2;
+        }
+    </style>
 </head>
 <body>
+    <div id="flex-wrapper">
+    <?php include "Frontend/navbar.php"; ?>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container">
-            <?php include "Frontend/navbar.php"; ?>
+    <div id="heroCaurossel" class="carousel slide" data-bs-ride="carousel">
+        <!-- Indicadores -->
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroCaurossel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#heroCaurossel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#heroCaurossel" data-bs-slide-to="2" aria-label="Slide 3"></button>
         </div>
-    </nav>
 
-    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+        <!-- Slides -->
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 400px;">
-                    <h1>Bem-vindo ao site da Associação Musical de Pedroso</h1>
+                <img src="../Frontend/img/carrossel-1.png" class="d-block w-100">
+                <div class="carousel-caption d-none d-md-block">
+                    <h2>Bem-vindos à Associação Musical de Pedroso</h2>
+                    <p class="opacity-75">Há mais de um século a promover a cultura e a arte musical na nossa freguesia.</p>
+                    <div class="d-flex gap-3 justify-content-center">
+                        <a href="Backend/noticias.php" class="btn btn-accent btn-lg">Explorar Notícias</a>
+                        <a href="Backend/horarios.php" class="btn btn-outline-light btn-lg">Ver Horários</a>
+                    </div>
                 </div>
             </div>
+            <div class="carousel-item">
+                <img src="../Frontend/img/carrossel-1.png" class="d-block w-100">
+                <div class="carousel-caption d-none d-md-block">
+                    <h2>A Nossa História</h2>
+                    <p class="opacity-75">Descubra as origens e a tradição que nos define ao longo das décadas.</p>
+                    <a href="Backend/historia.php" class="btn btn-outline-light btn-lg">Saber Mais</a>
+                </div>
             </div>
+            <div class="carousel-item">
+                <img src="../Frontend/img/carrossel-1.png" class="d-block w-100">
+                <div class="carousel-caption d-none d-md-block">
+                    <h2>As Nossas Atividades</h2>
+                    <p class="opacity-75">Concertos, ensaios e eventos para toda a comunidade.</p>
+                    <a href="Backend/horarios.php" class="btn btn-outline-light btn-lg">Ver Horários</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controlos -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCaurossel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCaurossel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Seguinte</span>
+        </button>
     </div>
 
-    <section id="noticias" class="py-5">
+    <section id="noticias" class="section-padding">
         <div class="container">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="mb-0">Últimas Notícias</h3>
-                <a href="Backend/noticias.php" class="btn btn-outline-primary btn-sm">Ver todas</a>
+            <div class="d-flex justify-content-between align-items-end mb-5">
+                <div>
+                    <h2 class="h1 mb-2">Últimas Notícias</h2>
+                    <p class="muted mb-0">Fique a par das novidades da nossa associação.</p>
+                </div>
+                <a href="Backend/noticias.php" class="btn btn-link text-decoration-none fw-bold p-0">Ver todas as notícias &rarr;</a>
             </div>
             <div class="row g-4">
                 <?php if($ultimasNoticias && $ultimasNoticias->num_rows > 0){ ?>
                     <?php while($noticia=$ultimasNoticias->fetch_assoc()){ ?>
                         <?php $imagemModal=$noticia["imagem"] ?? ""; ?>
                         <div class="col-12 col-md-6 col-lg-4">
-                            <div class="card h-100 shadow-sm">
+                            <div class="card h-100">
                                 <?php if($noticia["imagem"] != ""){ ?>
-                                    <img src="<?= htmlspecialchars($noticia["imagem"]) ?>" class="card-img-top noticia-card-img" alt="<?= htmlspecialchars($noticia["titulo"]) ?>">
+                                    <div class="overflow-hidden">
+                                        <img src="<?= htmlspecialchars($noticia["imagem"]) ?>" class="card-img-top" alt="<?= htmlspecialchars($noticia["titulo"]) ?>">
+                                    </div>
                                 <?php } ?>
-                                <div class="card-body d-flex flex-column">
-                                    <p class="text-muted small mb-2">
+                                <div class="card-body p-4 d-flex flex-column">
+                                    <span class="badge bg-light text-primary mb-3 align-self-start px-3 py-2">
                                         <?= date("d/m/Y", strtotime($noticia["data_criacao"])) ?>
-                                    </p>
-                                    <h5 class="card-title"><?= htmlspecialchars($noticia["titulo"]) ?></h5>
-                                    <p class="card-text text-muted flex-grow-1"><?= htmlspecialchars($noticia["resumo"] ?? "") ?></p>
+                                    </span>
+                                    <h4 class="card-title h5 mb-3"><?= htmlspecialchars($noticia["titulo"]) ?></h4>
+                                    <p class="card-text muted flex-grow-1 small"><?= htmlspecialchars($noticia["resumo"] ?? "") ?></p>
                                     <button type="button"
-                                            class="btn btn-outline-primary btn-sm align-self-start"
+                                            class="btn btn-outline-primary btn-sm mt-3 align-self-start"
                                             data-bs-toggle="modal"
                                             data-bs-target="#noticiaModal"
                                             data-noticia-titulo="<?= htmlspecialchars($noticia["titulo"], ENT_QUOTES, "UTF-8") ?>"
@@ -70,7 +152,9 @@ $ultimasNoticias=$conn->query("SELECT id_noticia, titulo, resumo, corpo, imagem,
                     <?php } ?>
                 <?php } else{ ?>
                     <div class="col-12">
-                        <div class="alert alert-info mb-0">Ainda não existem notícias.</div>
+                        <div class="alert border shadow-sm p-4 text-center mb-0">
+                            <p class="mb-0 muted">Ainda não existem notícias publicadas.</p>
+                        </div>
                     </div>
                 <?php } ?>
             </div>
@@ -83,7 +167,7 @@ $ultimasNoticias=$conn->query("SELECT id_noticia, titulo, resumo, corpo, imagem,
                 <div class="modal-header">
                     <div>
                         <h5 class="modal-title" id="noticiaModalLabel"></h5>
-                        <p class="text-muted small mb-0" id="noticiaModalData"></p>
+                        <p class="muted small mb-0" id="noticiaModalData"></p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
@@ -97,6 +181,8 @@ $ultimasNoticias=$conn->query("SELECT id_noticia, titulo, resumo, corpo, imagem,
                 </div>
             </div>
         </div>
+    </div>
+
     </div>
 
     <?php

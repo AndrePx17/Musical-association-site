@@ -165,68 +165,52 @@ if($resultado){
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../Frontend/style.css">
-    <style>
-        .card {
-            transform: none !important;
-            transition: none !important;
-            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
-        }
-        .card:hover {
-            transform: none !important;
-            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
-        }
-        .horario-img {
-            max-width: 900px;
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container">
-            <?php include "../Frontend/navbar.php"; ?>
-        </div>
-    </nav>
+    <div id="flex-wrapper">
+    <?php include "../Frontend/navbar.php"; ?>
 
     <?php if(isset($_SESSION["id_user"])){ ?>
-        <section class="hero-section">
+        <section class="section-padding border-bottom">
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-12 col-lg-8">
-                        <div class="card shadow-sm">
-                            <div class="card-body p-4">
-                                <h1 class="h3 mb-4 text-center">Gestão de Horários</h1>
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body p-4 p-md-5">
+                                <div class="text-center mb-4">
+                                    <span class="badge bg-light px-3 py-2 mb-2">Administração</span>
+                                    <h1 class="fw-bold">Gestão de Horários</h1>
+                                </div>
 
                                 <?php if($erroHorario!=""){ ?>
-                                    <div class="alert alert-danger"><?= htmlspecialchars($erroHorario) ?></div>
+                                    <div class="alert alert-danger small"><?= htmlspecialchars($erroHorario) ?></div>
                                 <?php } ?>
 
                                 <?php if($sucessoHorario!=""){ ?>
-                                    <div class="alert alert-success"><?= htmlspecialchars($sucessoHorario) ?></div>
+                                    <div class="alert alert-success small"><?= htmlspecialchars($sucessoHorario) ?></div>
                                 <?php } ?>
 
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="fw-bold">Instrumentos</span>
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h6 class="mb-0 fw-bold small">Instrumentos Registados</h6>
                                     <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#adicionarInstrumento">
-                                        + Adicionar
+                                        + Adicionar Instrumento
                                     </button>
                                 </div>
 
                                 <div class="collapse mb-4" id="adicionarInstrumento">
-                                    <form method="post">
-                                        <div class="input-group">
-                                            <input type="text" name="novo_instrumento" class="form-control" placeholder="Ex: Viola d'Arco">
-                                            <button type="submit" name="adicionar_instrumento" class="btn btn-outline-dark">Guardar</button>
-                                        </div>
-                                    </form>
+                                    <div class="p-3 bg-light rounded-3">
+                                        <form method="post">
+                                            <div class="input-group">
+                                                <input type="text" name="novo_instrumento" class="form-control" placeholder="Ex: Viola d'Arco">
+                                                <button type="submit" name="adicionar_instrumento" class="btn btn-primary btn-sm px-4">Guardar</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
 
                                 <form method="post" enctype="multipart/form-data">
                                     <div class="mb-3">
-                                        <label class="form-label">Instrumento</label>
+                                        <label class="form-label small fw-bold">Instrumento</label>
                                         <select name="instrumento_id" class="form-select" required>
                                             <option value="">-- Selecionar --</option>
                                             <?php foreach($instrumentos as $instrumento){ ?>
@@ -236,12 +220,12 @@ if($resultado){
                                             <?php } ?>
                                         </select>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Imagem do Horário</label>
+                                    <div class="mb-4">
+                                        <label class="form-label small fw-bold">Imagem do Horário</label>
                                         <input type="file" name="imagem" class="form-control" accept="image/jpeg,image/png,image/gif" required>
-                                        <div class="form-text">Formatos: JPG, PNG, JPEG ou GIF.</div>
+                                        <div class="form-text small">Formatos suportados: JPG, PNG, JPEG ou GIF.</div>
                                     </div>
-                                    <button type="submit" name="publicar_horario" class="btn btn-dark w-100">Publicar / Atualizar Horário</button>
+                                    <button type="submit" name="publicar_horario" class="btn btn-primary w-100 py-2">Publicar / Atualizar Horário</button>
                                 </form>
                             </div>
                         </div>
@@ -251,49 +235,63 @@ if($resultado){
         </section>
     <?php } ?>
 
-    <section id="exibir-horarios" class="py-5">
+    <section id="exibir-horarios" class="section-padding">
         <div class="container">
-            <h3 class="mb-4">Consulta de Horários</h3>
+            <div class="mb-5">
+                <h2 class="h1 fw-bold">Consulta de Horários</h2>
+                <p class="muted">Selecione o instrumento para visualizar o respetivo horário das aulas.</p>
+            </div>
 
             <?php if(empty($horarios)){ ?>
-                <div class="alert alert-info">Ainda não existem horários publicados.</div>
+                <div class="alert border shadow-sm p-5 text-center mb-0">
+                    <p class="mb-0 muted">Ainda não existem horários publicados.</p>
+                </div>
             <?php } else{ ?>
                 <div class="row mb-5">
-                    <div class="col-md-4">
-                        <label for="selecionarInstrumento" class="form-label fw-bold">Escolha o Instrumento:</label>
-                        <select id="selecionarInstrumento" class="form-select">
-                            <option value="">-- Selecionar --</option>
-                            <?php foreach($horarios as $horario){
-                                $idLimpo=preg_replace('/[^a-z0-9]/', '-', strtolower($horario["instrumento"]));
-                            ?>
-                                <option value="horario-<?= $idLimpo ?>">
-                                    <?= htmlspecialchars($horario["instrumento"]) ?>
-                                </option>
-                            <?php } ?>
-                        </select>
+                    <div class="col-md-5 col-lg-4">
+                        <div class="card border-0 shadow-sm p-4">
+                            <label for="selecionarInstrumento" class="form-label fw-bold small mb-3">Escolha o Instrumento:</label>
+                            <select id="selecionarInstrumento" class="form-select form-select-lg">
+                                <option value="">-- Selecionar --</option>
+                                <?php foreach($horarios as $horario){
+                                    $idLimpo=preg_replace('/[^a-z0-9]/', '-', strtolower($horario["instrumento"]));
+                                ?>
+                                    <option value="horario-<?= $idLimpo ?>">
+                                        <?= htmlspecialchars($horario["instrumento"]) ?>
+                                    </option>
+                                <?php } ?>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <div id="areaConteudoHorario">
-                    <?php foreach($horarios as $horario){
-                        $idLimpo=preg_replace('/[^a-z0-9]/', '-', strtolower($horario["instrumento"]));
-                    ?>
-                        <div id="horario-<?= $idLimpo ?>" class="horario-item d-none text-center">
-                            <h4 class="mb-4 text-primary"><?= htmlspecialchars($horario["instrumento"]) ?></h4>
-                            <img src="../<?= htmlspecialchars($horario["imagem"]) ?>" alt="Horário" class="horario-img">
+                <div id="areaConteudoHorario" class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <?php foreach($horarios as $horario){
+                            $idLimpo=preg_replace('/[^a-z0-9]/', '-', strtolower($horario["instrumento"]));
+                        ?>
+                            <div id="horario-<?= $idLimpo ?>" class="horario-item d-none text-center">
+                                <div class="card border-0 shadow-lg p-4 p-md-5">
+                                    <h4 class="mb-4 text-primary fw-bold"><?= htmlspecialchars($horario["instrumento"]) ?></h4>
+                                    <div class="overflow-hidden rounded-3 shadow-sm border mb-4">
+                                        <img src="../<?= htmlspecialchars($horario["imagem"]) ?>" alt="Horário" class="img-fluid">
+                                    </div>
 
-                            <?php if(isset($_SESSION["id_user"])){ ?>
-                                <form method="post" class="mt-4" onsubmit="return confirm('Tem a certeza que quer remover este horário?')">
-                                    <input type="hidden" name="instrumento_remover" value="<?= htmlspecialchars($horario["instrumento"]) ?>">
-                                    <button type="submit" name="remover_horario" class="btn btn-outline-danger">Remover Horário</button>
-                                </form>
-                            <?php } ?>
-                        </div>
-                    <?php } ?>
+                                    <?php if(isset($_SESSION["id_user"])){ ?>
+                                        <form method="post" class="mt-4 pt-4 border-top" onsubmit="return confirm('Tem a certeza que quer remover este horário?')">
+                                            <input type="hidden" name="instrumento_remover" value="<?= htmlspecialchars($horario["instrumento"]) ?>">
+                                            <button type="submit" name="remover_horario" class="btn btn-outline-danger btn-sm">Remover Horário</button>
+                                        </form>
+                                    <?php } ?>
+                                </div>
+                            </div>
+                        <?php } ?>
+                    </div>
                 </div>
             <?php } ?>
         </div>
     </section>
+    </div>
 
     <?php include "../Frontend/footer.php"; ?>
 
