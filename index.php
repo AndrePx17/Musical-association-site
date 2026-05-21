@@ -2,7 +2,7 @@
 session_start();
 include "Backend/config.php";
 
-$ultimasNoticias=$conn->query("SELECT id_noticia, titulo, resumo, corpo, imagem, data_criacao FROM TB_noticias ORDER BY data_criacao DESC, id_noticia DESC LIMIT 3");
+$ultimasNoticias=$conn->query("SELECT n.id_noticia, n.titulo, n.resumo, n.corpo, n.imagem, n.data_criacao, u.username AS autor FROM TB_noticias n JOIN TB_users u ON n.user_id = u.id_user ORDER BY n.data_criacao DESC, n.id_noticia DESC LIMIT 3");
 ?>
 <!DOCTYPE html>
 <html lang="pt">
@@ -14,65 +14,22 @@ $ultimasNoticias=$conn->query("SELECT id_noticia, titulo, resumo, corpo, imagem,
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link href="Frontend/style.css" rel="stylesheet">
-    <style>
-        #heroCaurossel,
-        #heroCaurossel .carousel-inner,
-        #heroCaurossel .carousel-item {
-            min-height: 520px;
-        }
-        #heroCaurossel .carousel-item img {
-            width: 100%;
-            height: 520px;
-            object-fit: cover;
-            object-position: center;
-        }
-        #heroCaurossel .carousel-item {
-            background-color: var(--bs-dark, #0d1b2a);
-        }
-        #heroCaurossel .carousel-caption {
-            bottom: 20%;
-            padding: 0 5%;
-        }
-        #heroCaurossel .carousel-caption h2 {
-            font-size: clamp(1.4rem, 3vw, 2.4rem);
-            font-weight: 700;
-            text-shadow: 0 2px 8px rgba(0,0,0,.6);
-        }
-        #heroCaurossel .carousel-caption p {
-            font-size: 1.05rem;
-            text-shadow: 0 1px 4px rgba(0,0,0,.5);
-            margin-bottom: 1.5rem;
-        }
-        /* Overlay escuro sobre as imagens para legibilidade do texto */
-        #heroCaurossel .carousel-item::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,.25) 0%, rgba(0,0,0,.55) 100%);
-            pointer-events: none;
-        }
-        #heroCaurossel .carousel-caption {
-            z-index: 2;
-        }
-    </style>
 </head>
 <body>
     <div id="flex-wrapper">
     <?php include "Frontend/navbar.php"; ?>
 
     <div id="heroCaurossel" class="carousel slide" data-bs-ride="carousel">
-        <!-- Indicadores -->
         <div class="carousel-indicators">
             <button type="button" data-bs-target="#heroCaurossel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
             <button type="button" data-bs-target="#heroCaurossel" data-bs-slide-to="1" aria-label="Slide 2"></button>
             <button type="button" data-bs-target="#heroCaurossel" data-bs-slide-to="2" aria-label="Slide 3"></button>
         </div>
 
-        <!-- Slides -->
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img src="../Frontend/img/carrossel-1.png" class="d-block w-100">
-                <div class="carousel-caption d-none d-md-block">
+                <img src="images/carrossel-1.png" class="d-block w-100">
+                <div class="carousel-caption">
                     <h2>Bem-vindos à Associação Musical de Pedroso</h2>
                     <p class="opacity-75">Há mais de um século a promover a cultura e a arte musical na nossa freguesia.</p>
                     <div class="d-flex gap-3 justify-content-center">
@@ -82,16 +39,16 @@ $ultimasNoticias=$conn->query("SELECT id_noticia, titulo, resumo, corpo, imagem,
                 </div>
             </div>
             <div class="carousel-item">
-                <img src="../Frontend/img/carrossel-1.png" class="d-block w-100">
-                <div class="carousel-caption d-none d-md-block">
+                <img src="images/carrossel-2.png" class="d-block w-100">
+                <div class="carousel-caption">
                     <h2>A Nossa História</h2>
                     <p class="opacity-75">Descubra as origens e a tradição que nos define ao longo das décadas.</p>
                     <a href="Backend/historia.php" class="btn btn-outline-light btn-lg">Saber Mais</a>
                 </div>
             </div>
             <div class="carousel-item">
-                <img src="../Frontend/img/carrossel-1.png" class="d-block w-100">
-                <div class="carousel-caption d-none d-md-block">
+                <img src="images/carrossel-3.png" class="d-block w-100">
+                <div class="carousel-caption">
                     <h2>As Nossas Atividades</h2>
                     <p class="opacity-75">Concertos, ensaios e eventos para toda a comunidade.</p>
                     <a href="Backend/horarios.php" class="btn btn-outline-light btn-lg">Ver Horários</a>
@@ -99,7 +56,6 @@ $ultimasNoticias=$conn->query("SELECT id_noticia, titulo, resumo, corpo, imagem,
             </div>
         </div>
 
-        <!-- Controlos -->
         <button class="carousel-control-prev" type="button" data-bs-target="#heroCaurossel" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Anterior</span>
@@ -109,12 +65,22 @@ $ultimasNoticias=$conn->query("SELECT id_noticia, titulo, resumo, corpo, imagem,
             <span class="visually-hidden">Seguinte</span>
         </button>
     </div>
+    <section id="Quem_somos_res" class="section-padding">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-end">
+                <div>
+                    <h2 class="mb-2">Quem Somos?</h2>
+                    <p class="mb-0 muted">A Associação Musical de Pedroso (AMP) é uma instituição de utilidade pública fundada em 1980, nascida do entusiasmo e do amor à música que, desde 1975, animava já o Coro Polifónico de Pedroso. Com mais de quatro décadas de história ao serviço da comunidade, somos um polo de dinamização cultural que une a Escola de Música, a Escola de Dança <i>Let's Dance</i>, o Coro Polifónico de Pedroso e a Orquestra de Câmara de Pedroso. Acreditamos que a música e a dança transformam pessoas e comunidades — por isso oferecemos um ensino de qualidade, rigoroso e humano, aberto a todas as idades, com o orgulho de fazer de Pedroso um lugar onde a cultura floresce.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <section id="noticias" class="section-padding">
         <div class="container">
             <div class="d-flex justify-content-between align-items-end mb-5">
                 <div>
-                    <h2 class="h1 mb-2">Últimas Notícias</h2>
+                    <h2 class="mb-2">Últimas Notícias</h2>
                     <p class="muted mb-0">Fique a par das novidades da nossa associação.</p>
                 </div>
                 <a href="Backend/noticias.php" class="btn btn-link text-decoration-none fw-bold p-0">Ver todas as notícias &rarr;</a>
@@ -131,9 +97,14 @@ $ultimasNoticias=$conn->query("SELECT id_noticia, titulo, resumo, corpo, imagem,
                                     </div>
                                 <?php } ?>
                                 <div class="card-body p-4 d-flex flex-column">
-                                    <span class="badge bg-light text-primary mb-3 align-self-start px-3 py-2">
-                                        <?= date("d/m/Y", strtotime($noticia["data_criacao"])) ?>
-                                    </span>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="badge bg-light text-primary align-self-start px-3 py-2">
+                                            <?= date("d/m/Y", strtotime($noticia["data_criacao"])) ?>
+                                        </span>
+                                        <span class="small muted">
+                                            Por: <?= htmlspecialchars($noticia["autor"]) ?>
+                                        </span>
+                                    </div>
                                     <h4 class="card-title h5 mb-3"><?= htmlspecialchars($noticia["titulo"]) ?></h4>
                                     <p class="card-text muted flex-grow-1 small"><?= htmlspecialchars($noticia["resumo"] ?? "") ?></p>
                                     <button type="button"

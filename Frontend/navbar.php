@@ -14,6 +14,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item"><a class="nav-link px-3" href="/index.php">Início</a></li>
+                <li class="nav-item"><a class="nav-link px-3" href="/Backend/historia.php">Quem Somos</a></li>
                 <li class="nav-item"><a class="nav-link px-3" href="/Backend/noticias.php">Notícias</a></li>
                 <li class="nav-item"><a class="nav-link px-3" href="/Backend/horarios.php">Horários</a></li>
                 

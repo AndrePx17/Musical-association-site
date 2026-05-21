@@ -56,4 +56,34 @@ if (isset($_POST["registar"])){
         }
     }
 }
+
+/**
+ * Faz upload de uma imagem para images/{subpasta}/.
+ * Devolve o caminho para a BD ou false se ocorrer erro.
+ */
+function uploadImagem($file, $subpasta, &$erro) {
+    if (!isset($file) || $file["error"] != UPLOAD_ERR_OK) {
+        $erro = "Escolha uma imagem válida.";
+        return false;
+    }
+
+    $target_path = "../images/" . $subpasta . "/";
+    
+    $nomeImagem = basename($file["name"]);
+    $target_file = $target_path . $nomeImagem;
+    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+    $imagemCaminhoBD = "images/" . $subpasta . "/" . $nomeImagem;
+
+    if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
+        $erro = "Formato inválido. Use JPG, PNG, JPEG ou GIF.";
+        return false;
+    }
+
+    if (move_uploaded_file($file["tmp_name"], $target_file)) {
+        return $imagemCaminhoBD;
+    } else {
+        $erro = "Erro ao guardar o ficheiro no servidor.";
+        return false;
+    }
+}
 ?>

@@ -1,6 +1,7 @@
 <?php
 session_start();
 include "config.php";
+include "funcoes.php";
 
 $erroNoticia="";
 $sucessoNoticia="";
@@ -54,18 +55,7 @@ if(isset($_POST["editar_noticia"]) && isset($_SESSION["id_user"])){
     }
     else{
         if($erroUpload==UPLOAD_ERR_OK){
-            $target_path="../images/noticias/";
-            $nomeImagem=basename($_FILES["imagem"]["name"]);
-            $target_file=$target_path.$nomeImagem;
-            $imageFileType=strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-            $novaImagem="images/noticias/".$nomeImagem;
-
-            if($imageFileType!="jpg" && $imageFileType!="png" && $imageFileType!="jpeg" && $imageFileType!="gif"){
-                $erroNoticia="Formato inválido. Use JPG, PNG, JPEG ou GIF.";
-            }
-            elseif(!move_uploaded_file($_FILES["imagem"]["tmp_name"], $target_file)){
-                $erroNoticia="Erro ao guardar o ficheiro no servidor.";
-            }
+            $novaImagem = uploadImagem($_FILES["imagem"], "noticias", $erroNoticia);
         }
 
         if($erroNoticia==""){
@@ -103,44 +93,32 @@ if(isset($_POST["criar_noticia"]) && isset($_SESSION["id_user"])){
         $erroNoticia="Escolha uma imagem para a noticia.";
     }
     else{
-        $target_path="../images/noticias/";
-        $nomeImagem=basename($_FILES["imagem"]["name"]);
-        $target_file=$target_path.$nomeImagem;
-        $imageFileType=strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-        $imagem="images/noticias/".$nomeImagem;
+        $imagem = uploadImagem($_FILES["imagem"], "noticias", $erroNoticia);
 
-        if($imageFileType!="jpg" && $imageFileType!="png" && $imageFileType!="jpeg" && $imageFileType!="gif"){
-            $erroNoticia="Formato inválido. Use JPG, PNG, JPEG ou GIF.";
-        }
-        else{
-            if(move_uploaded_file($_FILES["imagem"]["tmp_name"], $target_file)){
-                $stmt=$conn->prepare("INSERT INTO TB_noticias (titulo, resumo, corpo, imagem, user_id) VALUES (?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssssi", $titulo, $resumo, $corpo, $imagem, $user_id);
+        if($imagem !== false){
+            $stmt=$conn->prepare("INSERT INTO TB_noticias (titulo, resumo, corpo, imagem, user_id) VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssi", $titulo, $resumo, $corpo, $imagem, $user_id);
 
-                try{
-                    $criada=$stmt->execute();
-                }
-                catch(mysqli_sql_exception $e){
-                    $criada=false;
-                }
+            try{
+                $criada=$stmt->execute();
+            }
+            catch(mysqli_sql_exception $e){
+                $criada=false;
+            }
 
-                if($criada){
-                    header("Location: noticias.php?sucesso=1");
-                    exit();
-                }
-                else{
-                    $erroNoticia="Erro ao criar a noticia. Tente novamente.";
-                }
-                $stmt->close();
+            if($criada){
+                header("Location: noticias.php?sucesso=1");
+                exit();
             }
             else{
-                $erroNoticia="Erro ao guardar o ficheiro no servidor.";
+                $erroNoticia="Erro ao criar a noticia. Tente novamente.";
             }
+            $stmt->close();
         }
     }
 }
 
-$noticias=$conn->query("SELECT id_noticia, titulo, resumo, corpo, imagem, data_criacao FROM TB_noticias ORDER BY data_criacao DESC, id_noticia DESC");
+$noticias=$conn->query("SELECT n.id_noticia, n.titulo, n.resumo, n.corpo, n.imagem, n.data_criacao, u.username AS autor FROM TB_noticias n JOIN TB_users u ON n.user_id = u.id_user ORDER BY n.data_criacao DESC, n.id_noticia DESC");
 ?>
 <!DOCTYPE html>
 <html>
@@ -232,6 +210,9 @@ $noticias=$conn->query("SELECT id_noticia, titulo, resumo, corpo, imagem, data_c
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <span class="badge bg-light text-primary px-3 py-2">
                                             <?= date("d/m/Y", strtotime($noticia["data_criacao"])) ?>
+                                        </span>
+                                        <span class="small muted">
+                                            Por: <?= htmlspecialchars($noticia["autor"]) ?>
                                         </span>
                                     </div>
                                     <h4 class="card-title h5 mb-3 fw-bold"><?= htmlspecialchars($noticia["titulo"]) ?></h4>

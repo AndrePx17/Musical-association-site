@@ -3,12 +3,12 @@
         <div class="row g-4">
             <div class="col-lg-4">
                 <h5 class="footer-title">Associação Musical de Pedroso</h5>
-                <p class="opacity-75 small">Uma instituição dedicada ao ensino e divulgação da música na freguesia de Pedroso há mais de 100 anos. Venha conhecer a nossa banda e escola de música.</p>
+                <p class="opacity-75 small">Uma instituição dedicada ao ensino e divulgação da música na freguesia de Pedroso. Venha conhecer a nossa banda e escola de música.</p>
             </div>
             <div class="col-lg-3">
                 <h5 class="footer-title">Contactos</h5>
-                <p class="opacity-75 small mb-1">Pedroso, Vila Nova de Gaia</p>
-                <p class="opacity-75 small">Email: geral@ampedroso.pt</p>
+                <p class="opacity-75 small mb-1">Av. Pedro Hispano 35, 4415-296 Pedroso, Vila Nova de Gaia</p>
+                <p class="opacity-75 small">Email: -------------</p>
             </div>
         </div>
         <hr class="my-4 opacity-25">

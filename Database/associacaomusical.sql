@@ -29,8 +29,7 @@ CREATE TABLE IF NOT EXISTS TB_noticias(
 
 CREATE TABLE IF NOT EXISTS TB_instrumentos(
     id_instrumento INT UNIQUE PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(100) NOT NULL,
-    codigo VARCHAR(100) NOT NULL UNIQUE
+    nome VARCHAR(100) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS TB_horarios (
@@ -46,18 +45,15 @@ CREATE TABLE IF NOT EXISTS TB_logs (
     data_evento TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- View para simplificar a consulta de notícias com o nome do autor
-CREATE OR REPLACE VIEW VW_noticias_com_autor AS
+-- View para gerir o estado dos horários por instrumento
+CREATE OR REPLACE VIEW VW_gestao_horarios AS
 SELECT 
-    n.id_noticia, 
-    n.titulo, 
-    n.resumo, 
-    n.corpo, 
-    n.imagem, 
-    n.data_criacao, 
-    u.username AS autor
-FROM TB_noticias n
-JOIN TB_users u ON n.user_id = u.id_user;
+    i.id_instrumento,
+    i.nome AS instrumento,
+    h.data_atualizacao,
+    IF(h.imagem IS NULL OR h.imagem = '', 'Sem Horário', 'Atualizado') AS estado
+FROM TB_instrumentos i
+LEFT JOIN TB_horarios h ON i.nome = h.instrumento;
 
 -- Trigger para registar quando uma notícia é removida
 DELIMITER //

@@ -1,28 +1,10 @@
 <?php
 session_start();
 include "config.php";
+include "funcoes.php";
 
 $erroHorario="";
 $sucessoHorario="";
-
-function limparNomeInstrumento($nome)
-{
-    return trim(preg_replace('/\s+/', ' ', $nome));
-}
-
-function criarCodigoInstrumento($nome)
-{
-    $codigo=iconv("UTF-8", "ASCII//TRANSLIT", $nome);
-
-    if($codigo===false){
-        $codigo=$nome;
-    }
-
-    $codigo=strtolower($codigo);
-    $codigo=preg_replace('/[^a-z0-9]/', '', $codigo);
-
-    return $codigo;
-}
 
 if(isset($_GET["sucesso"]) && $_GET["sucesso"]=="1"){
     $sucessoHorario="Horário atualizado com sucesso.";
@@ -37,15 +19,14 @@ if(isset($_GET["instrumento"]) && $_GET["instrumento"]=="1"){
 }
 
 if(isset($_POST["adicionar_instrumento"]) && isset($_SESSION["id_user"])){
-    $novoInstrumento=limparNomeInstrumento($_POST["novo_instrumento"] ?? "");
-    $codigoInstrumento=criarCodigoInstrumento($novoInstrumento);
+    $novoInstrumento=trim(strtolower($_POST["novo_instrumento"] ?? ""));
 
-    if($novoInstrumento=="" || $codigoInstrumento==""){
+    if($novoInstrumento==""){
         $erroHorario="Escreva o nome do instrumento.";
     }
     else{
-        $stmt=$conn->prepare("SELECT id_instrumento FROM TB_instrumentos WHERE codigo=?");
-        $stmt->bind_param("s", $codigoInstrumento);
+        $stmt=$conn->prepare("SELECT id_instrumento FROM TB_instrumentos WHERE nome=?");
+        $stmt->bind_param("s", $novoInstrumento);
         $stmt->execute();
         $stmt->store_result();
 
@@ -54,8 +35,8 @@ if(isset($_POST["adicionar_instrumento"]) && isset($_SESSION["id_user"])){
         }
         else{
             $stmt->close();
-            $stmt=$conn->prepare("INSERT INTO TB_instrumentos (nome, codigo) VALUES (?, ?)");
-            $stmt->bind_param("ss", $novoInstrumento, $codigoInstrumento);
+            $stmt=$conn->prepare("INSERT INTO TB_instrumentos (nome) VALUES (?)");
+            $stmt->bind_param("s", $novoInstrumento);
 
             if($stmt->execute()){
                 header("Location: horarios.php?instrumento=1");
@@ -88,32 +69,20 @@ if(isset($_POST["publicar_horario"]) && isset($_SESSION["id_user"])){
         }
         else{
             $stmt->close();
-            $target_path="../images/horarios/";
-            $nomeImagem=basename($_FILES["imagem"]["name"]);
-            $target_file=$target_path.$nomeImagem;
-            $imageFileType=strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-            $imagem="images/horarios/".$nomeImagem;
+            $imagem = uploadImagem($_FILES["imagem"], "horarios", $erroHorario);
 
-            if($imageFileType!="jpg" && $imageFileType!="png" && $imageFileType!="jpeg" && $imageFileType!="gif"){
-                $erroHorario="Formato inválido. Use JPG, PNG, JPEG ou GIF.";
-            }
-            else{
-                if(move_uploaded_file($_FILES["imagem"]["tmp_name"], $target_file)){
-                    $stmt=$conn->prepare("INSERT INTO TB_horarios (instrumento, imagem) VALUES (?, ?) ON DUPLICATE KEY UPDATE imagem = VALUES(imagem)");
-                    $stmt->bind_param("ss", $instrumento, $imagem);
+            if($imagem !== false){
+                $stmt=$conn->prepare("INSERT INTO TB_horarios (instrumento, imagem) VALUES (?, ?) ON DUPLICATE KEY UPDATE imagem = VALUES(imagem)");
+                $stmt->bind_param("ss", $instrumento, $imagem);
 
-                    if($stmt->execute()){
-                        header("Location: horarios.php?sucesso=1");
-                        exit();
-                    }
-                    else{
-                        $erroHorario="Erro ao guardar na base de dados.";
-                    }
-                    $stmt->close();
+                if($stmt->execute()){
+                    header("Location: horarios.php?sucesso=1");
+                    exit();
                 }
                 else{
-                    $erroHorario="Erro ao guardar o ficheiro no servidor.";
+                    $erroHorario="Erro ao guardar na base de dados.";
                 }
+                $stmt->close();
             }
         }
     }
@@ -198,10 +167,10 @@ if($resultado){
                                 </div>
 
                                 <div class="collapse mb-4" id="adicionarInstrumento">
-                                    <div class="p-3 bg-light rounded-3">
+                                    <div class="p-3 rounded-3" style="background-color: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
                                         <form method="post">
                                             <div class="input-group">
-                                                <input type="text" name="novo_instrumento" class="form-control" placeholder="Ex: Viola d'Arco">
+                                                <input type="text" name="novo_instrumento" class="form-control" placeholder="Ex: Viola d'Arco" style="border-right: none;">
                                                 <button type="submit" name="adicionar_instrumento" class="btn btn-primary btn-sm px-4">Guardar</button>
                                             </div>
                                         </form>
